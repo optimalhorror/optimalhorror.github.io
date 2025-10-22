@@ -1,5 +1,7 @@
-theme: minima
-title: optimalhorror
-description: nothing interesting, apolocheese
+remote_theme: jekyll/minima
+plugins:
+  - jekyll-remote-theme
 minima:
   skin: dark
+title: optimalhorror
+description: nothing interesting, apolocheese
