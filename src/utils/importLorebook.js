@@ -15,11 +15,21 @@ function generatePosition(index, total) {
 
 export function importLorebook(json) {
   const elements = [];
-  const entries = json.entries || [];
+  // Support both array format [...] and object format { entries: [...] }
+  let entries;
+  if (Array.isArray(json)) {
+    entries = json;
+  } else if (json && typeof json === 'object' && Array.isArray(json.entries)) {
+    entries = json.entries;
+  } else {
+    console.error('Invalid lorebook format:', json);
+    return [];
+  }
   nodeCounter = 0;
 
   // First pass: create all location nodes (we need their IDs for spawn edges)
   const locationMap = {}; // keyword -> node id
+  const sublocationMap = {}; // sublocation name -> { parentId, parentKeyword }
 
   entries.forEach((entry, index) => {
     if (entry.category === 'location') {
@@ -37,19 +47,23 @@ export function importLorebook(json) {
           images: entry.images || {},
           filters: entry.filters || {},
           // triggers stored temporarily for edge reconstruction
-          _importedTriggers: entry.triggers || [],
+          _importedTriggers: Array.isArray(entry.triggers) ? entry.triggers : [],
         },
         position: pos,
       });
 
       // Map keywords to this location's ID
-      (entry.keywords || []).forEach(kw => {
-        locationMap[kw.toLowerCase()] = id;
+      const keywords = Array.isArray(entry.keywords) ? entry.keywords : [];
+      keywords.forEach(kw => {
+        if (typeof kw === 'string') {
+          locationMap[kw.toLowerCase()] = id;
+        }
       });
 
       // Handle sublocations - position them relative to parent
       if (entry.subLocations) {
         const subEntries = Object.entries(entry.subLocations);
+        const firstKeyword = keywords[0];
         subEntries.forEach(([subName, subData], subIndex) => {
           const subId = `subloc_${++nodeCounter}`;
           // Position sublocations in a row below the parent center
@@ -65,6 +79,8 @@ export function importLorebook(json) {
             },
             position: { x: subX, y: subY },
           });
+          // Map sublocation name to parent location info (store original name for export)
+          sublocationMap[subName.toLowerCase()] = { parentId: id, parentKeyword: firstKeyword, originalName: subName };
         });
       }
     }
@@ -93,19 +109,47 @@ export function importLorebook(json) {
 
       // Create spawn edges from canSpawnAt
       if (entry.canSpawnAt) {
-        Object.entries(entry.canSpawnAt).forEach(([locKeyword, probability]) => {
-          const targetId = locationMap[locKeyword.toLowerCase()];
-          if (targetId) {
-            elements.push({
-              data: {
-                id: `edge_${++nodeCounter}`,
-                source: id,
-                target: targetId,
-                edgeType: 'spawn',
-                probability,
-              },
-            });
+        // Group by location - main locations and their sublocations
+        const locationSpawns = {}; // locationId -> { probability, sublocationProbabilities }
+
+        Object.entries(entry.canSpawnAt).forEach(([key, probability]) => {
+          const keyLower = key.toLowerCase();
+
+          // Check if this is a location keyword
+          const locId = locationMap[keyLower];
+          if (locId) {
+            if (!locationSpawns[locId]) {
+              locationSpawns[locId] = { probability, sublocationProbabilities: {} };
+            } else {
+              locationSpawns[locId].probability = probability;
+            }
+          } else {
+            // Check if this is a sublocation name
+            const subInfo = sublocationMap[keyLower];
+            if (subInfo) {
+              if (!locationSpawns[subInfo.parentId]) {
+                locationSpawns[subInfo.parentId] = { probability: 0.1, sublocationProbabilities: {} };
+              }
+              // Use the original case name from the sublocation
+              locationSpawns[subInfo.parentId].sublocationProbabilities[subInfo.originalName] = probability;
+            }
           }
+        });
+
+        // Create edges for each location
+        Object.entries(locationSpawns).forEach(([targetId, spawnData]) => {
+          elements.push({
+            data: {
+              id: `edge_${++nodeCounter}`,
+              source: id,
+              target: targetId,
+              edgeType: 'spawn',
+              probability: spawnData.probability,
+              sublocationProbabilities: Object.keys(spawnData.sublocationProbabilities).length > 0
+                ? spawnData.sublocationProbabilities
+                : undefined,
+            },
+          });
         });
       }
     }
@@ -135,19 +179,47 @@ export function importLorebook(json) {
 
       // Create spawn edges from canSpawnAt (only for non-global, non-"any" entries)
       if (entry.canSpawnAt && !isGlobal) {
-        Object.entries(entry.canSpawnAt).forEach(([locKeyword, probability]) => {
-          const targetId = locationMap[locKeyword.toLowerCase()];
-          if (targetId) {
-            elements.push({
-              data: {
-                id: `edge_${++nodeCounter}`,
-                source: id,
-                target: targetId,
-                edgeType: 'spawn',
-                probability,
-              },
-            });
+        // Group by location - main locations and their sublocations
+        const locationSpawns = {}; // locationId -> { probability, sublocationProbabilities }
+
+        Object.entries(entry.canSpawnAt).forEach(([key, probability]) => {
+          const keyLower = key.toLowerCase();
+
+          // Check if this is a location keyword
+          const locId = locationMap[keyLower];
+          if (locId) {
+            if (!locationSpawns[locId]) {
+              locationSpawns[locId] = { probability, sublocationProbabilities: {} };
+            } else {
+              locationSpawns[locId].probability = probability;
+            }
+          } else {
+            // Check if this is a sublocation name
+            const subInfo = sublocationMap[keyLower];
+            if (subInfo) {
+              if (!locationSpawns[subInfo.parentId]) {
+                locationSpawns[subInfo.parentId] = { probability: 0.1, sublocationProbabilities: {} };
+              }
+              // Use the original case name from the sublocation
+              locationSpawns[subInfo.parentId].sublocationProbabilities[subInfo.originalName] = probability;
+            }
           }
+        });
+
+        // Create edges for each location
+        Object.entries(locationSpawns).forEach(([targetId, spawnData]) => {
+          elements.push({
+            data: {
+              id: `edge_${++nodeCounter}`,
+              source: id,
+              target: targetId,
+              edgeType: 'spawn',
+              probability: spawnData.probability,
+              sublocationProbabilities: Object.keys(spawnData.sublocationProbabilities).length > 0
+                ? spawnData.sublocationProbabilities
+                : undefined,
+            },
+          });
         });
       }
     }
@@ -156,7 +228,7 @@ export function importLorebook(json) {
   // Third pass: create adjacent edges from location triggers
   // If a location's triggers include another location's keyword, create an adjacent edge
   elements.forEach(el => {
-    if (el.data.type === 'location' && el.data._importedTriggers) {
+    if (el.data.type === 'location' && Array.isArray(el.data._importedTriggers)) {
       el.data._importedTriggers.forEach(trigger => {
         const targetId = locationMap[trigger.toLowerCase()];
         if (targetId && targetId !== el.data.id) {

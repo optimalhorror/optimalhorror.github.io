@@ -468,6 +468,34 @@ button.primary:hover {
   font-weight: 500;
 }
 
+.sublocation-probs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subloc-prob-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.subloc-prob-row .checkbox-group {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+}
+
+.subloc-prob-input {
+  width: 60px;
+  padding: 4px 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
 input[type="file"] {
   display: none;
 }

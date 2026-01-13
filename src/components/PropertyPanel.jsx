@@ -116,18 +116,16 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         </div>
 
         {selected.edgeType === 'spawn' && (
-          <div className="form-group">
-            <label>Spawn Probability</label>
-            <input
-              type="number"
-              min="0"
-              max="1"
-              step="0.05"
-              value={formData.probability || 0.1}
-              onChange={(e) => handleChange('probability', parseFloat(e.target.value))}
-            />
-            <div className="hint">0-1, e.g., 0.25 = 25% chance</div>
-          </div>
+          <SpawnProbabilityEditor
+            formData={formData}
+            targetNode={targetNode}
+            elements={elements}
+            onUpdate={(updates) => {
+              Object.entries(updates).forEach(([key, value]) => {
+                handleChange(key, value);
+              });
+            }}
+          />
         )}
 
         {selected.edgeType === 'knows' && (
@@ -189,7 +187,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         />
       </div>
 
-      {type !== 'sublocation' && (
+      {(type === 'location' || type === 'character') && (
         <div className="form-group">
           <label>Keywords</label>
           <TagsInput
@@ -295,7 +293,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         </div>
       )}
 
-      {(type === 'location' || type === 'character' || type === 'event' || type === 'sublocation') && (
+      {(type === 'location' || type === 'character' || type === 'sublocation') && (
         <div className="form-group">
           <label>Images</label>
           <ImagesEditor
@@ -321,6 +319,93 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         Delete {type.charAt(0).toUpperCase() + type.slice(1)}
       </button>
     </div>
+  );
+}
+
+function SpawnProbabilityEditor({ formData, targetNode, elements, onUpdate }) {
+  // Find sublocations of the target location
+  const sublocations = targetNode?.type === 'location'
+    ? elements
+        .filter(el => el.data.type === 'sublocation' && el.data.parent === targetNode.id)
+        .map(el => el.data)
+    : [];
+
+  const handleMainProbChange = (value) => {
+    onUpdate({ probability: value });
+  };
+
+  const handleSublocationProbChange = (subName, value) => {
+    const currentProbs = formData.sublocationProbabilities || {};
+    onUpdate({
+      sublocationProbabilities: {
+        ...currentProbs,
+        [subName]: value,
+      },
+    });
+  };
+
+  return (
+    <>
+      <div className="form-group">
+        <label>Spawn Probability ({targetNode?.name || 'Location'})</label>
+        <input
+          type="number"
+          min="0"
+          max="1"
+          step="0.05"
+          value={formData.probability || 0.1}
+          onChange={(e) => handleMainProbChange(parseFloat(e.target.value))}
+        />
+        <div className="hint">0-1, e.g., 0.25 = 25% chance</div>
+      </div>
+
+      {sublocations.length > 0 && (
+        <div className="form-group">
+          <label>Sublocation Probabilities</label>
+          <div className="sublocation-probs">
+            {sublocations.map(sub => {
+              const prob = formData.sublocationProbabilities?.[sub.name];
+              const isEnabled = prob !== undefined && prob !== null;
+              const displayProb = isEnabled ? prob : formData.probability || 0.1;
+
+              return (
+                <div key={sub.id} className="subloc-prob-row">
+                  <label className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      checked={isEnabled}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          handleSublocationProbChange(sub.name, formData.probability || 0.1);
+                        } else {
+                          // Remove from sublocationProbabilities
+                          const currentProbs = { ...formData.sublocationProbabilities };
+                          delete currentProbs[sub.name];
+                          onUpdate({ sublocationProbabilities: currentProbs });
+                        }
+                      }}
+                    />
+                    {sub.name}
+                  </label>
+                  {isEnabled && (
+                    <input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={displayProb}
+                      onChange={(e) => handleSublocationProbChange(sub.name, parseFloat(e.target.value))}
+                      className="subloc-prob-input"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="hint">Check to set different probability per sublocation (0 = never spawns there)</div>
+        </div>
+      )}
+    </>
   );
 }
 

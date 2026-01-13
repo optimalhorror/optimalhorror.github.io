@@ -141,18 +141,23 @@ export function exportLorebook(elements) {
       if (target?.keywords?.[0]) {
         canSpawnAt[target.keywords[0]] = e.data.probability || 0.1;
       }
+      // Add sublocation-specific probabilities
+      if (e.data.sublocationProbabilities) {
+        Object.entries(e.data.sublocationProbabilities).forEach(([subName, prob]) => {
+          // Only add if probability is > 0 (0 means "never spawn here")
+          if (prob > 0) {
+            canSpawnAt[subName] = prob;
+          }
+        });
+      }
     });
 
     // Get relationship data for this character
     const relData = characterRelationships[data.id] || { triggers: [], contentAppend: '', contentShortAppend: '' };
 
-    // Character triggers locations they can spawn at (for short descriptions)
-    const locationTriggers = spawnEdges
-      .map(e => nodeById[e.data.target]?.keywords?.[0])
-      .filter(Boolean);
-
-    // Triggers are auto-generated: from knows edges + spawn locations
-    const allTriggers = [...new Set([...relData.triggers, ...locationTriggers])];
+    // Triggers are auto-generated from knows edges only
+    // (spawn locations don't trigger - spawning somewhere doesn't mean you bring that location's description)
+    const allTriggers = [...new Set(relData.triggers)];
 
     // Append relationship content if any
     let content = data.content || '';
@@ -200,6 +205,14 @@ export function exportLorebook(elements) {
         if (target?.keywords?.[0]) {
           canSpawnAt[target.keywords[0]] = e.data.probability || 0.1;
         }
+        // Add sublocation-specific probabilities
+        if (e.data.sublocationProbabilities) {
+          Object.entries(e.data.sublocationProbabilities).forEach(([subName, prob]) => {
+            if (prob > 0) {
+              canSpawnAt[subName] = prob;
+            }
+          });
+        }
       });
     }
 
@@ -219,5 +232,5 @@ export function exportLorebook(elements) {
     });
   });
 
-  return { entries };
+  return entries;
 }
