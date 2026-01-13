@@ -73,7 +73,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
             <li><strong>Events</strong> — Time-filtered or global occurrences</li>
           </ul>
           <p className="script-link">
-            Script: <a href="https://placeholder-for-graph" target="_blank" rel="noopener">placeholder-for-graph</a>
+            Script: <a href="https://janitorai.com/characters/969e2b4a-037c-4242-aa25-55ccacd45785_character-running-1st-year" target="_blank" rel="noopener">Template Bot</a>
           </p>
         </div>
       </div>

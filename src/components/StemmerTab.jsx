@@ -49,7 +49,7 @@ export function StemmerTab() {
             Paste text below. Separate entries with blank lines. Export entries + vocabulary for the runtime script.
           </p>
           <p className="script-link">
-            Script: <a href="https://placeholder-for-stemmer" target="_blank" rel="noopener">placeholder-for-stemmer</a>
+            Script: <a href="https://janitorai.com/characters/ca0b9d9c-5e64-47fc-8b2b-ff00121ee66a_character-mairon-aules-apprentice" target="_blank" rel="noopener">Template Bot</a>
           </p>
         </div>
       </div>
