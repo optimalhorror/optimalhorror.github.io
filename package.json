@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build && cp -r dist/* . && git add -A && git commit -m 'Deploy' && git push"
   },
   "dependencies": {
     "cytoscape": "^3.33.1",
