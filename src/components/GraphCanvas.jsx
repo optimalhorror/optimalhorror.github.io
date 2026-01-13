@@ -1,145 +1,183 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
 
-const stylesheet = [
-  // Location nodes
-  {
-    selector: 'node[type="location"]',
-    style: {
-      'background-color': '#3b82f6',
-      'label': 'data(name)',
-      'color': '#1e40af',
-      'text-valign': 'bottom',
-      'text-margin-y': 8,
-      'font-size': 12,
-      'width': 50,
-      'height': 50,
-      'border-width': 2,
-      'border-color': '#1e40af',
-    }
-  },
-  // Character nodes
-  {
-    selector: 'node[type="character"]',
-    style: {
-      'background-color': '#22c55e',
-      'label': 'data(name)',
-      'color': '#166534',
-      'text-valign': 'bottom',
-      'text-margin-y': 8,
-      'font-size': 12,
-      'width': 50,
-      'height': 50,
-      'border-width': 2,
-      'border-color': '#166534',
-    }
-  },
-  // Event nodes
-  {
-    selector: 'node[type="event"]',
-    style: {
-      'background-color': '#f97316',
-      'label': 'data(name)',
-      'color': '#c2410c',
-      'text-valign': 'bottom',
-      'text-margin-y': 8,
-      'font-size': 12,
-      'width': 50,
-      'height': 50,
-      'border-width': 2,
-      'border-color': '#c2410c',
-    }
-  },
-  // Sublocation nodes
-  {
-    selector: 'node[type="sublocation"]',
-    style: {
-      'background-color': '#818cf8',
-      'label': 'data(name)',
-      'color': '#3730a3',
-      'text-valign': 'bottom',
-      'text-margin-y': 6,
-      'font-size': 10,
-      'width': 30,
-      'height': 30,
-      'border-width': 2,
-      'border-color': '#3730a3',
-    }
-  },
-  // Parent nodes (compound)
-  {
-    selector: ':parent',
-    style: {
-      'background-opacity': 0.1,
-      'border-width': 2,
-      'border-color': '#1e40af',
-      'padding': 20,
-    }
-  },
-  // Selected nodes
-  {
-    selector: 'node:selected',
-    style: {
-      'border-width': 3,
-      'border-color': '#000',
-    }
-  },
-  // Spawn edges (character/event -> location)
-  {
-    selector: 'edge[edgeType="spawn"]',
-    style: {
-      'width': 2,
-      'line-color': '#9ca3af',
-      'target-arrow-color': '#9ca3af',
-      'target-arrow-shape': 'triangle',
-      'curve-style': 'bezier',
-      'line-style': 'dashed',
-      'label': 'data(probability)',
-      'font-size': 10,
-      'text-background-color': '#fff',
-      'text-background-opacity': 1,
-      'text-background-padding': 2,
-    }
-  },
-  // Adjacent edges (location -- location, undirected)
-  {
-    selector: 'edge[edgeType="adjacent"]',
-    style: {
-      'width': 2,
-      'line-color': '#60a5fa',
-      'curve-style': 'bezier',
-    }
-  },
-  // Knows edges (character -- character, undirected)
-  {
-    selector: 'edge[edgeType="knows"]',
-    style: {
-      'width': 2,
-      'line-color': '#a855f7',
-      'curve-style': 'bezier',
-      'label': 'data(relationship)',
-      'font-size': 10,
-      'text-background-color': '#fff',
-      'text-background-opacity': 1,
-      'text-background-padding': 2,
-    }
-  },
-  // Selected edges
-  {
-    selector: 'edge:selected',
-    style: {
-      'width': 3,
-      'line-color': '#000',
-      'target-arrow-color': '#000',
-    }
-  },
-];
+function getStylesheet(isDark) {
+  const labelColor = isDark ? '#e0e0e0' : undefined; // undefined uses node-specific colors in light mode
+  const textBg = isDark ? '#2f2f2f' : '#fff';
+  const selectedBorder = isDark ? '#fff' : '#000';
+  const selectedEdge = isDark ? '#fff' : '#000';
+
+  return [
+    // Location nodes
+    {
+      selector: 'node[type="location"]',
+      style: {
+        'background-color': '#3b82f6',
+        'label': 'data(name)',
+        'color': labelColor || '#1e40af',
+        'text-valign': 'bottom',
+        'text-margin-y': 8,
+        'font-size': 12,
+        'width': 50,
+        'height': 50,
+        'border-width': 2,
+        'border-color': '#1e40af',
+      }
+    },
+    // Character nodes
+    {
+      selector: 'node[type="character"]',
+      style: {
+        'background-color': '#22c55e',
+        'label': 'data(name)',
+        'color': labelColor || '#166534',
+        'text-valign': 'bottom',
+        'text-margin-y': 8,
+        'font-size': 12,
+        'width': 50,
+        'height': 50,
+        'border-width': 2,
+        'border-color': '#166534',
+      }
+    },
+    // Event nodes
+    {
+      selector: 'node[type="event"]',
+      style: {
+        'background-color': '#f97316',
+        'label': 'data(name)',
+        'color': labelColor || '#c2410c',
+        'text-valign': 'bottom',
+        'text-margin-y': 8,
+        'font-size': 12,
+        'width': 50,
+        'height': 50,
+        'border-width': 2,
+        'border-color': '#c2410c',
+      }
+    },
+    // Sublocation nodes
+    {
+      selector: 'node[type="sublocation"]',
+      style: {
+        'background-color': '#818cf8',
+        'label': 'data(name)',
+        'color': labelColor || '#3730a3',
+        'text-valign': 'bottom',
+        'text-margin-y': 6,
+        'font-size': 10,
+        'width': 30,
+        'height': 30,
+        'border-width': 2,
+        'border-color': '#3730a3',
+      }
+    },
+    // Parent nodes (compound)
+    {
+      selector: ':parent',
+      style: {
+        'background-opacity': 0.1,
+        'border-width': 2,
+        'border-color': '#1e40af',
+        'padding': 20,
+      }
+    },
+    // Selected nodes
+    {
+      selector: 'node:selected',
+      style: {
+        'border-width': 3,
+        'border-color': selectedBorder,
+      }
+    },
+    // Spawn edges (character/event -> location)
+    {
+      selector: 'edge[edgeType="spawn"]',
+      style: {
+        'width': 2,
+        'line-color': '#9ca3af',
+        'target-arrow-color': '#9ca3af',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'bezier',
+        'line-style': 'dashed',
+        'label': 'data(probability)',
+        'font-size': 10,
+        'color': isDark ? '#e0e0e0' : '#333',
+        'text-background-color': textBg,
+        'text-background-opacity': 1,
+        'text-background-padding': 2,
+      }
+    },
+    // Adjacent edges (location -- location, undirected)
+    {
+      selector: 'edge[edgeType="adjacent"]',
+      style: {
+        'width': 2,
+        'line-color': '#60a5fa',
+        'curve-style': 'bezier',
+      }
+    },
+    // Knows edges (character -- character, undirected)
+    {
+      selector: 'edge[edgeType="knows"]',
+      style: {
+        'width': 2,
+        'line-color': '#a855f7',
+        'curve-style': 'bezier',
+        'label': 'data(relationship)',
+        'font-size': 10,
+        'color': isDark ? '#e0e0e0' : '#333',
+        'text-background-color': textBg,
+        'text-background-opacity': 1,
+        'text-background-padding': 2,
+      }
+    },
+    // Selected edges
+    {
+      selector: 'edge:selected',
+      style: {
+        'width': 3,
+        'line-color': selectedEdge,
+        'target-arrow-color': selectedEdge,
+      }
+    },
+  ];
+}
 
 export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
   const containerRef = useRef(null);
   const [edgeSource, setEdgeSource] = useState(null);
   const edgeSourceRef = useRef(null);
   const initializedCyRef = useRef(null);
+  const [isDark, setIsDark] = useState(() =>
+    document.documentElement.getAttribute('data-theme') === 'dark'
+  );
+
+  // Watch for theme changes
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+
+  // Update cytoscape stylesheet when theme changes
+  useEffect(() => {
+    if (cyRef.current) {
+      cyRef.current.style(getStylesheet(isDark).concat({
+        selector: '.edge-source',
+        style: {
+          'border-width': 4,
+          'border-color': '#ef4444',
+        }
+      }));
+    }
+  }, [isDark, cyRef]);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -261,7 +299,7 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
 
   // Add style for edge source
   const fullStylesheet = [
-    ...stylesheet,
+    ...getStylesheet(isDark),
     {
       selector: '.edge-source',
       style: {

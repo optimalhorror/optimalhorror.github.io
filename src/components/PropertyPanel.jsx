@@ -138,7 +138,10 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
                 onChange={(e) => handleChange('relationship', e.target.value)}
                 placeholder="e.g., roommates, siblings, rivals"
               />
-              <div className="hint">Goes to both characters' descriptions</div>
+              <div className="hint">
+                Goes to both characters' descriptions.
+                Triggers: "{sourceNode?.keywords?.[0] || '?'}" ↔ "{targetNode?.keywords?.[0] || '?'}"
+              </div>
             </div>
 
             <div className="form-group">

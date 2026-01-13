@@ -227,16 +227,18 @@ export function importLorebook(json) {
 
   // Third pass: create adjacent edges from location triggers
   // If a location's triggers include another location's keyword, create an adjacent edge
+  // Adjacent edges are undirected, so we only create one edge per pair
   elements.forEach(el => {
     if (el.data.type === 'location' && Array.isArray(el.data._importedTriggers)) {
       el.data._importedTriggers.forEach(trigger => {
         const targetId = locationMap[trigger.toLowerCase()];
         if (targetId && targetId !== el.data.id) {
-          // Check if this edge already exists
+          // Check if this edge already exists in EITHER direction (adjacent edges are undirected)
           const exists = elements.some(e =>
-            e.data.source === el.data.id &&
-            e.data.target === targetId &&
-            e.data.edgeType === 'adjacent'
+            e.data.edgeType === 'adjacent' && (
+              (e.data.source === el.data.id && e.data.target === targetId) ||
+              (e.data.source === targetId && e.data.target === el.data.id)
+            )
           );
 
           if (!exists) {
