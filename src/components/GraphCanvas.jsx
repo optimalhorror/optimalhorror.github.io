@@ -216,9 +216,8 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
       }
     });
 
-    // Right-click to start edge creation
-    cy.on('cxttap', 'node', (e) => {
-      const node = e.target;
+    // Right-click or long-press to start edge creation
+    const startEdgeCreation = (node) => {
       const type = node.data('type');
 
       // Can only start edges from location, character, or event
@@ -230,7 +229,13 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
         setEdgeSource(node.id());
         node.addClass('edge-source');
       }
-    });
+    };
+
+    // Right-click (desktop)
+    cy.on('cxttap', 'node', (e) => startEdgeCreation(e.target));
+
+    // Long-press (mobile) - 500ms hold
+    cy.on('taphold', 'node', (e) => startEdgeCreation(e.target));
   }, [cyRef, onSelect, onAddEdge]);
 
   // Add style for edge source

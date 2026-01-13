@@ -58,7 +58,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         <h3>Properties</h3>
         <p className="empty">Select a node or edge to edit</p>
         <p className="hint-text">
-          Click nodes to select them. Right-click a node to start creating an edge, then click the target node.
+          Tap nodes to select. Long-press (or right-click) a node to start creating an edge, then tap the target.
         </p>
 
         <div className="info-section">
