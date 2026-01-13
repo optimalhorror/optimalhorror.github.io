@@ -363,6 +363,76 @@ button.primary:hover {
   font-size: 12px;
 }
 
+.image-key {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.image-key.time-key {
+  color: var(--accent);
+  font-size: 10px;
+  min-width: auto;
+  max-width: 100px;
+  word-break: break-word;
+}
+
+.time-image-add {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+
+.time-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.time-chip {
+  padding: 4px 8px;
+  font-size: 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.time-chip:hover {
+  border-color: var(--accent);
+}
+
+.time-chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.time-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.time-url-row input {
+  flex: 1;
+}
+
+.add-time-btn {
+  padding: 6px 12px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
 .add-btn {
   font-size: 12px;
   padding: 4px 8px;

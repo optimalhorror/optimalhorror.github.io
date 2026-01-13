@@ -1,5 +1,17 @@
 // Convert Cytoscape elements to lorebook.json format
 
+// Only return images object if it has non-empty URLs
+function cleanImages(images) {
+  if (!images) return {};
+  const cleaned = {};
+  for (const [key, url] of Object.entries(images)) {
+    if (url && typeof url === 'string' && url.trim()) {
+      cleaned[key] = url.trim();
+    }
+  }
+  return cleaned;
+}
+
 export function exportLorebook(elements) {
   const entries = [];
 
@@ -20,8 +32,9 @@ export function exportLorebook(elements) {
     const subLocations = {};
     nodes.filter(n => n.data.type === 'sublocation' && n.data.parent === data.id)
       .forEach(sub => {
+        const subImages = cleanImages(sub.data.images);
         subLocations[sub.data.name] = {
-          images: sub.data.images || {},
+          images: subImages,
         };
       });
 
@@ -48,7 +61,7 @@ export function exportLorebook(elements) {
       content: data.content || '',
       contentShort: data.contentShort || '',
       triggers: allTriggers,
-      images: data.images || {},
+      images: cleanImages(data.images),
       filters: data.filters || {},
       enabled: true,
     };
@@ -160,7 +173,7 @@ export function exportLorebook(elements) {
       contentShort,
       triggers: allTriggers,
       canSpawnAt: Object.keys(canSpawnAt).length > 0 ? canSpawnAt : {},
-      images: data.images || {},
+      images: cleanImages(data.images),
       filters: data.filters || {},
       disabledFor: data.disabledFor || [],
       enabled: true,

@@ -42,7 +42,7 @@ export function Toolbar({ onAddNode, onImport, onExport, onClear }) {
       />
 
       <div style={{ marginLeft: 'auto', fontSize: 12, color: '#666' }}>
-        Right-click node to start edge, then click target
+        Right-click or long-press node to start edge, then click target
       </div>
     </div>
   );
