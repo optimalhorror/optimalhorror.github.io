@@ -162,13 +162,17 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
       // If we have an edge source, create edge
       if (currentEdgeSource && currentEdgeSource !== node.id()) {
         const sourceNode = cy.getElementById(currentEdgeSource);
-        const sourceType = sourceNode.data('type');
-        const targetType = node.data('type');
+        const targetNode = node;
+        let sourceType = sourceNode.data('type');
+        let targetType = targetNode.data('type');
 
         // Determine edge type based on source/target
         let edgeType = null;
         let edgeData = {};
+        let actualSource = currentEdgeSource;
+        let actualTarget = node.id();
 
+        // Character/Event → Location = spawn
         if ((sourceType === 'character' || sourceType === 'event') && targetType === 'location') {
           // Check if event is global - global events can't have spawn edges
           if (sourceType === 'event' && sourceNode.data('isGlobal')) {
@@ -177,9 +181,26 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
             edgeType = 'spawn';
             edgeData.probability = parseFloat(prompt('Spawn probability (0-1):', '0.1') || '0.1');
           }
-        } else if (sourceType === 'location' && targetType === 'location') {
+        }
+        // Location → Character/Event = spawn (flip direction)
+        else if (sourceType === 'location' && (targetType === 'character' || targetType === 'event')) {
+          // Check if event is global
+          if (targetType === 'event' && targetNode.data('isGlobal')) {
+            alert('Global events cannot have location-specific spawn edges. Uncheck "Global Event" first.');
+          } else {
+            edgeType = 'spawn';
+            edgeData.probability = parseFloat(prompt('Spawn probability (0-1):', '0.1') || '0.1');
+            // Flip: character/event should be source, location should be target
+            actualSource = node.id();
+            actualTarget = currentEdgeSource;
+          }
+        }
+        // Location ↔ Location = adjacent
+        else if (sourceType === 'location' && targetType === 'location') {
           edgeType = 'adjacent';
-        } else if (sourceType === 'character' && targetType === 'character') {
+        }
+        // Character ↔ Character = knows
+        else if (sourceType === 'character' && targetType === 'character') {
           edgeType = 'knows';
           edgeData.relationship = prompt('Relationship (e.g., "roommates"):', '') || '';
           edgeData.sourceThinks = '';
@@ -187,9 +208,9 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
         }
 
         if (edgeType) {
-          onAddEdge(currentEdgeSource, node.id(), edgeType, edgeData.probability, edgeData);
-        } else if (!(sourceType === 'event' && sourceNode.data('isGlobal'))) {
-          alert('Invalid connection. Characters/Events can connect to Locations. Locations can connect to Locations. Characters can connect to Characters (knows).');
+          onAddEdge(actualSource, actualTarget, edgeType, edgeData.probability, edgeData);
+        } else if (!((sourceType === 'event' && sourceNode.data('isGlobal')) || (targetType === 'event' && targetNode.data('isGlobal')))) {
+          alert('Invalid connection. Characters/Events ↔ Locations (spawn). Locations ↔ Locations (adjacent). Characters ↔ Characters (knows).');
         }
 
         cy.getElementById(currentEdgeSource).removeClass('edge-source');
