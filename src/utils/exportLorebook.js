@@ -25,23 +25,21 @@ export function exportLorebook(elements) {
         };
       });
 
-    // Find adjacent edges (location -> location) to add to triggers
-    const adjacentEdges = edges.filter(e =>
+    // Find adjacent edges (bidirectional - location as source OR target)
+    const adjacentAsSource = edges.filter(e =>
       e.data.source === data.id && e.data.edgeType === 'adjacent'
     );
+    const adjacentAsTarget = edges.filter(e =>
+      e.data.target === data.id && e.data.edgeType === 'adjacent'
+    );
 
-    const adjacentTriggers = adjacentEdges
-      .map(e => {
-        const target = nodeById[e.data.target];
-        return target?.keywords?.[0];
-      })
-      .filter(Boolean);
+    const adjacentTriggers = [
+      ...adjacentAsSource.map(e => nodeById[e.data.target]?.keywords?.[0]),
+      ...adjacentAsTarget.map(e => nodeById[e.data.source]?.keywords?.[0]),
+    ].filter(Boolean);
 
-    // Combine existing triggers with adjacent triggers, avoiding duplicates
-    const allTriggers = [...new Set([
-      ...(data.triggers || []),
-      ...adjacentTriggers,
-    ])];
+    // Triggers are auto-generated from edges only
+    const allTriggers = [...new Set(adjacentTriggers)];
 
     const entry = {
       keywords: data.keywords || [],
@@ -135,8 +133,13 @@ export function exportLorebook(elements) {
     // Get relationship data for this character
     const relData = characterRelationships[data.id] || { triggers: [], contentAppend: '', contentShortAppend: '' };
 
-    // Combine triggers (avoiding duplicates)
-    const allTriggers = [...new Set([...(data.triggers || []), ...relData.triggers])];
+    // Character triggers locations they can spawn at (for short descriptions)
+    const locationTriggers = spawnEdges
+      .map(e => nodeById[e.data.target]?.keywords?.[0])
+      .filter(Boolean);
+
+    // Triggers are auto-generated: from knows edges + spawn locations
+    const allTriggers = [...new Set([...relData.triggers, ...locationTriggers])];
 
     // Append relationship content if any
     let content = data.content || '';

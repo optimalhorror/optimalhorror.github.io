@@ -200,15 +200,17 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
               onChange={(e) => handleContentShortChange(e.target.value)}
               placeholder="Short description..."
             />
+            <div className="hint">Triggered by connected nodes</div>
           </div>
 
           <div className="form-group">
-            <label>Triggers</label>
+            <label>Requires Any (Filter)</label>
             <TagsInput
-              value={formData.triggers || []}
-              onChange={(triggers) => handleChange('triggers', triggers)}
-              placeholder="Add trigger..."
+              value={formData.filters?.requiresAny || []}
+              onChange={(requiresAny) => handleChange('filters', { ...formData.filters, requiresAny })}
+              placeholder="e.g., forest, cave..."
             />
+            <div className="hint">Keyword must match AND any of these words must appear</div>
           </div>
         </>
       )}

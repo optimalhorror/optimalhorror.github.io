@@ -35,8 +35,9 @@ export function importLorebook(json) {
           content: entry.content || '',
           contentShort: entry.contentShort || '',
           images: entry.images || {},
-          triggers: entry.triggers || [],
           filters: entry.filters || {},
+          // triggers stored temporarily for edge reconstruction
+          _importedTriggers: entry.triggers || [],
         },
         position: pos,
       });
@@ -84,7 +85,6 @@ export function importLorebook(json) {
           content: entry.content || '',
           contentShort: entry.contentShort || '',
           images: entry.images || {},
-          triggers: entry.triggers || [],
           disabledFor: entry.disabledFor || [],
           filters: entry.filters || {},
         },
@@ -156,8 +156,8 @@ export function importLorebook(json) {
   // Third pass: create adjacent edges from location triggers
   // If a location's triggers include another location's keyword, create an adjacent edge
   elements.forEach(el => {
-    if (el.data.type === 'location' && el.data.triggers) {
-      el.data.triggers.forEach(trigger => {
+    if (el.data.type === 'location' && el.data._importedTriggers) {
+      el.data._importedTriggers.forEach(trigger => {
         const targetId = locationMap[trigger.toLowerCase()];
         if (targetId && targetId !== el.data.id) {
           // Check if this edge already exists
@@ -179,6 +179,8 @@ export function importLorebook(json) {
           }
         }
       });
+      // Clean up temporary field
+      delete el.data._importedTriggers;
     }
   });
 
