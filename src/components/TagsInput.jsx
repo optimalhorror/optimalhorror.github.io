@@ -3,13 +3,18 @@ import { useState } from 'react';
 export function TagsInput({ value = [], onChange, placeholder }) {
   const [input, setInput] = useState('');
 
+  const addTag = () => {
+    if (input.trim() && !value.includes(input.trim())) {
+      onChange([...value, input.trim()]);
+    }
+    setInput('');
+  };
+
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && input.trim()) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      if (!value.includes(input.trim())) {
-        onChange([...value, input.trim()]);
-      }
-      setInput('');
+      e.stopPropagation();
+      addTag();
     } else if (e.key === 'Backspace' && !input && value.length > 0) {
       onChange(value.slice(0, -1));
     }
@@ -32,8 +37,12 @@ export function TagsInput({ value = [], onChange, placeholder }) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
+        enterKeyHint="done"
         placeholder={value.length === 0 ? placeholder : ''}
       />
+      {input.trim() && (
+        <button type="button" className="add-tag-btn" onClick={addTag}>+</button>
+      )}
     </div>
   );
 }

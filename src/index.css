@@ -270,6 +270,24 @@ button.primary:hover {
   outline: none;
 }
 
+.tags-input .add-tag-btn {
+  padding: 4px 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  min-width: 32px;
+  min-height: 28px;
+}
+
+.tags-input .add-tag-btn:active {
+  opacity: 0.8;
+}
+
 .checkbox-group {
   display: flex;
   align-items: center;

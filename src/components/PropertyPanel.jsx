@@ -177,7 +177,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
             onChange={(keywords) => handleChange('keywords', keywords)}
             placeholder="Add keyword..."
           />
-          <div className="hint">Press Enter to add</div>
+          <div className="hint">Press Enter or tap + to add</div>
         </div>
       )}
 
