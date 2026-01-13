@@ -101,27 +101,21 @@ const stylesheet = [
       'text-background-padding': 2,
     }
   },
-  // Adjacent edges (location -> location)
+  // Adjacent edges (location -- location, undirected)
   {
     selector: 'edge[edgeType="adjacent"]',
     style: {
       'width': 2,
       'line-color': '#60a5fa',
-      'target-arrow-color': '#60a5fa',
-      'target-arrow-shape': 'triangle',
       'curve-style': 'bezier',
     }
   },
-  // Knows edges (character <-> character)
+  // Knows edges (character -- character, undirected)
   {
     selector: 'edge[edgeType="knows"]',
     style: {
       'width': 2,
       'line-color': '#a855f7',
-      'target-arrow-color': '#a855f7',
-      'target-arrow-shape': 'triangle',
-      'source-arrow-color': '#a855f7',
-      'source-arrow-shape': 'triangle',
       'curve-style': 'bezier',
       'label': 'data(relationship)',
       'font-size': 10,
@@ -167,7 +161,8 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
 
       // If we have an edge source, create edge
       if (currentEdgeSource && currentEdgeSource !== node.id()) {
-        const sourceType = cy.getElementById(currentEdgeSource).data('type');
+        const sourceNode = cy.getElementById(currentEdgeSource);
+        const sourceType = sourceNode.data('type');
         const targetType = node.data('type');
 
         // Determine edge type based on source/target
@@ -175,8 +170,13 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
         let edgeData = {};
 
         if ((sourceType === 'character' || sourceType === 'event') && targetType === 'location') {
-          edgeType = 'spawn';
-          edgeData.probability = parseFloat(prompt('Spawn probability (0-1):', '0.1') || '0.1');
+          // Check if event is global - global events can't have spawn edges
+          if (sourceType === 'event' && sourceNode.data('isGlobal')) {
+            alert('Global events cannot have location-specific spawn edges. Uncheck "Global Event" first.');
+          } else {
+            edgeType = 'spawn';
+            edgeData.probability = parseFloat(prompt('Spawn probability (0-1):', '0.1') || '0.1');
+          }
         } else if (sourceType === 'location' && targetType === 'location') {
           edgeType = 'adjacent';
         } else if (sourceType === 'character' && targetType === 'character') {
@@ -188,7 +188,7 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
 
         if (edgeType) {
           onAddEdge(currentEdgeSource, node.id(), edgeType, edgeData.probability, edgeData);
-        } else {
+        } else if (!(sourceType === 'event' && sourceNode.data('isGlobal'))) {
           alert('Invalid connection. Characters/Events can connect to Locations. Locations can connect to Locations. Characters can connect to Characters (knows).');
         }
 

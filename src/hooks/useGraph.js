@@ -93,12 +93,27 @@ export function useGraph() {
   }, []);
 
   const updateElement = useCallback((id, updates) => {
-    setElements(prev => prev.map(el => {
-      if (el.data.id === id) {
-        return { ...el, data: { ...el.data, ...updates } };
+    setElements(prev => {
+      let updated = prev.map(el => {
+        if (el.data.id === id) {
+          return { ...el, data: { ...el.data, ...updates } };
+        }
+        return el;
+      });
+
+      // If an event is marked as global, remove its spawn edges
+      if (updates.isGlobal === true) {
+        updated = updated.filter(el => {
+          // Remove spawn edges where this event is the source
+          if (el.data.source === id && el.data.edgeType === 'spawn') {
+            return false;
+          }
+          return true;
+        });
       }
-      return el;
-    }));
+
+      return updated;
+    });
 
     if (selectedElement?.id === id) {
       setSelectedElement(prev => ({ ...prev, ...updates }));

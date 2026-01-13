@@ -85,14 +85,34 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
     const sourceNode = elements.find(el => el.data.id === selected.source)?.data;
     const targetNode = elements.find(el => el.data.id === selected.target)?.data;
 
+    // Build edge description based on type
+    const getEdgeDescription = () => {
+      const srcName = sourceNode?.name || selected.source;
+      const tgtName = targetNode?.name || selected.target;
+
+      switch (selected.edgeType) {
+        case 'adjacent':
+          return `${srcName} is connected to ${tgtName}`;
+        case 'spawn':
+          if (sourceNode?.type === 'character') {
+            return `${srcName} shows up in ${tgtName}`;
+          } else {
+            return `${srcName} occurs in ${tgtName}`;
+          }
+        case 'knows':
+          return `${srcName} and ${tgtName} are ${formData.relationship || '...'}`;
+        default:
+          return `${srcName} → ${tgtName}`;
+      }
+    };
+
     return (
       <div className="property-panel">
         <h3>Edge Properties</h3>
         <span className={`node-type-badge ${selected.edgeType === 'knows' ? 'knows' : 'edge'}`}>{selected.edgeType}</span>
 
         <div className="edge-info">
-          <div><span>From:</span> {sourceNode?.name || selected.source}</div>
-          <div><span>To:</span> {targetNode?.name || selected.target}</div>
+          <div>{getEdgeDescription()}</div>
         </div>
 
         {selected.edgeType === 'spawn' && (
