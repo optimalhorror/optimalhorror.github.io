@@ -88,7 +88,7 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
     return (
       <div className="property-panel">
         <h3>Edge Properties</h3>
-        <span className="node-type-badge edge">{selected.edgeType}</span>
+        <span className={`node-type-badge ${selected.edgeType === 'knows' ? 'knows' : 'edge'}`}>{selected.edgeType}</span>
 
         <div className="edge-info">
           <div><span>From:</span> {sourceNode?.name || selected.source}</div>
