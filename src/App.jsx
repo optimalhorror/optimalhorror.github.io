@@ -6,6 +6,7 @@ import { PropertyPanel } from './components/PropertyPanel';
 import { StemmerTab } from './components/StemmerTab';
 import { importLorebook } from './utils/importLorebook';
 import { exportLorebook } from './utils/exportLorebook';
+import exampleLorebook from './data/example-lorebook.json';
 
 function App() {
   const graph = useGraph();
@@ -48,15 +49,9 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
-  const handleLoadExample = async () => {
-    try {
-      const response = await fetch('/example-lorebook.json');
-      const json = await response.json();
-      const elements = importLorebook(json);
-      graph.loadElements(elements);
-    } catch (err) {
-      alert('Failed to load example: ' + err.message);
-    }
+  const handleLoadExample = () => {
+    const elements = importLorebook(exampleLorebook);
+    graph.loadElements(elements);
   };
 
   return (
