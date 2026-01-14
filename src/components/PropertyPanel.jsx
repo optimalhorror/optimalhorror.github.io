@@ -3,6 +3,17 @@ import { TagsInput } from './TagsInput';
 import { ImagesEditor } from './ImagesEditor';
 import { parseContent, formatContent } from '../utils/contentFormat';
 
+const TIME_OPTIONS = [
+  'early morning',
+  'late morning',
+  'midday',
+  'early afternoon',
+  'late afternoon',
+  'evening',
+  'night',
+  'late night',
+];
+
 export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSubLocation }) {
   const [formData, setFormData] = useState({});
   // Store the "inner" content separately for editing (without Name=[...] wrapper)
@@ -261,11 +272,25 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
 
           <div className="form-group">
             <label>Time Filter</label>
-            <TagsInput
-              value={formData.timeFilter || []}
-              onChange={(timeFilter) => handleChange('timeFilter', timeFilter)}
-              placeholder="e.g., evening, night..."
-            />
+            <div className="time-picker">
+              {TIME_OPTIONS.map(time => (
+                <button
+                  key={time}
+                  type="button"
+                  className={`time-chip ${(formData.timeFilter || []).includes(time) ? 'selected' : ''}`}
+                  onClick={() => {
+                    const current = formData.timeFilter || [];
+                    const newFilter = current.includes(time)
+                      ? current.filter(t => t !== time)
+                      : [...current, time];
+                    handleChange('timeFilter', newFilter);
+                  }}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
+            <div className="hint">Event only triggers during selected times</div>
           </div>
 
           <div className="form-group">
