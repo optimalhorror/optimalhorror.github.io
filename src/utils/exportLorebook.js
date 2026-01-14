@@ -232,7 +232,7 @@ export function exportLorebook(elements) {
       triggers: [],
       canSpawnAt,
       timeFilter: data.timeFilter || [],
-      images: {},
+      images: cleanImages(data.images),
       filters: data.filters || {},
       disabledFor: [],
       enabled: true,

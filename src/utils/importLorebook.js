@@ -172,6 +172,7 @@ export function importLorebook(json) {
           timeFilter: entry.timeFilter || [],
           isGlobal,
           globalSpawnChance,
+          images: entry.images || {},
           filters: entry.filters || {},
         },
         position: pos,

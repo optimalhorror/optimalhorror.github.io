@@ -342,6 +342,16 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
         </div>
       )}
 
+      {type === 'event' && (
+        <div className="form-group">
+          <label>Images</label>
+          <EventImagesEditor
+            value={formData.images || {}}
+            onChange={(images) => handleChange('images', images)}
+          />
+        </div>
+      )}
+
       {type === 'location' && (
         <div className="form-group">
           <label>Sublocations</label>
@@ -469,6 +479,69 @@ function SublocationsDisplay({ parentId, elements, onAddSubLocation, onDelete })
       }}>
         + Add Sublocation
       </button>
+    </div>
+  );
+}
+
+// Simplified image editor for events - only default images (array for random pick)
+function EventImagesEditor({ value = {}, onChange }) {
+  // Normalize to array
+  const urls = Array.isArray(value.default)
+    ? value.default
+    : (typeof value.default === 'string' && value.default.trim() ? [value.default] : []);
+
+  const handleAdd = (url) => {
+    if (url.trim()) {
+      onChange({ default: [...urls, url.trim()] });
+    }
+  };
+
+  const handleRemove = (index) => {
+    const newUrls = urls.filter((_, i) => i !== index);
+    onChange(newUrls.length > 0 ? { default: newUrls } : {});
+  };
+
+  const handleUpdate = (index, url) => {
+    if (url.trim()) {
+      const newUrls = [...urls];
+      newUrls[index] = url.trim();
+      onChange({ default: newUrls });
+    }
+  };
+
+  return (
+    <div className="event-images">
+      {urls.map((url, index) => (
+        <div key={index} className="image-entry">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => handleUpdate(index, e.target.value)}
+            placeholder="Image URL..."
+          />
+          <button type="button" onClick={() => handleRemove(index)}>×</button>
+        </div>
+      ))}
+      <div className="image-entry add-url-row">
+        <input
+          type="text"
+          placeholder="Add image URL..."
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+              handleAdd(e.target.value);
+              e.target.value = '';
+            }
+          }}
+        />
+        <button type="button" onClick={(e) => {
+          const input = e.target.previousElementSibling;
+          if (input.value.trim()) {
+            handleAdd(input.value);
+            input.value = '';
+          }
+        }}>+</button>
+      </div>
+      <div className="hint">Multiple images = random pick. Time filter controls when event triggers.</div>
     </div>
   );
 }
