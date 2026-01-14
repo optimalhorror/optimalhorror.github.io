@@ -1,0 +1,110 @@
+[
+    {
+      "keywords": [ "quad", "courtyard", "outside", "statue", "blackwell", "maurice" ],
+      "category": "location",
+      "name": "The Quad",
+      "content": "\nThe Quad=[central green, 40 acres bordered by Georgian brick buildings. Pathways named after donors. Bronze statue of founder Maurice Blackwell at center. North: Founders Hall (admin), further Greek Row with Delta Kappa fraternity. East: Hartley Library. South: Morrison Chapel. West: Faculty offices, further Sterling Science Complex. Memorial benches line the walkways. Students gather on the lawn in warm weather]",
+      "contentShort": "\nThe Quad=[central green, Georgian buildings, Maurice Blackwell statue, surrounded by Founders Hall, Hartley Library, Morrison Chapel. Walking distance of Sterling Science Building]",
+      "triggers": [ "sterling" ],
+      "images": {
+        "default": "https://ella.janitorai.com/media-approved/yGOjZ03fHR008F28H9zBy.webp",
+        "evening,night,late night": "https://ella.janitorai.com/media-approved/XdvtGEdaLfazPLhhoBknv.webp"
+      },
+      "enabled": true,
+      "subLocations": {
+        "statue": {
+          "images": {
+            "default": "https://ella.janitorai.com/media-approved/tB5eI1zF4L3ryIJYKnpPt.webp"
+          }
+        }
+      }
+    },
+    {
+      "keywords": [ "sterling", "science", "math", "stem", "chemistry", "biology", "pre-med", "premed", "biochem", "biochemistry", "physics" ],
+      "category": "location",
+      "name": "Sterling Science Complex",
+      "content": "\nSterling Science Complex=[1970s brutalist concrete complex, frequently under renovation. Houses Biology, Chemistry, Physics, Computer Science, Mathematics. Mix of modern grant-funded equipment and aging department resources. Competitive pre-med culture in study rooms]",
+      "contentShort": "\nSterling Science Complex=[STEM building, brutalist, labs and lecture halls]",
+      "triggers": [ "quad", "griffith" ],
+      "images": {
+        "default": "https://ella.janitorai.com/media-approved/hNiBiUUB9424F01AGj0bL.webp",
+        "evening,night,late night": "https://ella.janitorai.com/media-approved/9sfvQwVQqf8BigN0sX4M_.webp"
+      },
+      "enabled": true,
+      "subLocations": {
+        "hallway": { "images": { "default": "https://ella.janitorai.com/media-approved/6cLZu91Q1W6l0iywkackz.webp" } },
+        "lab": { "images": { "default": "https://ella.janitorai.com/media-approved/LZiOb9sAnuvk2518qDzu5.webp" } },
+        "griffith's office": { "images": { "default": "https://ella.janitorai.com/media-approved/SsNXb8829pGed84h5vsj9.webp" } }
+      }
+    },
+    {
+      "keywords": [ "kappa", "fraternity", "frat" ],
+      "category": "location",
+      "name": "Delta Kappa",
+      "content": "\nDelta Kappa=[oldest fraternity on campus, founded 1847. Three-story brick house with columns. Strong legacy admission tradition. Alumni network spans finance, law, and politics. Invitation-only events. Members include two state senators among alumni. Marcus Webb is the President]",
+      "contentShort": "\nDelta Kappa=[oldest fraternity, 1847, influential alumni network]",
+      "triggers": [ "leo" ],
+      "images": {
+        "default": "https://ella.janitorai.com/media-approved/SvO-d6U5Dg_iqfdnT7DHu.webp",
+        "evening,night,late night": "https://ella.janitorai.com/media-approved/wMttozSMfyxx9WX4Ecbio.webp"
+      },
+      "filters": {
+        "requiresAny": [ "party", "house", "fraternity", "kappa", "delta" ]
+      },
+      "enabled": true,
+      "subLocations": {
+        "leo's bedroom": { "images": { "default": "https://ella.janitorai.com/media-approved/qn8mQRlK8KtKDYTEjkC8K.webp" } },
+        "common room": { "images": { "default": "https://ella.janitorai.com/media-approved/L2Ui8WvLLHVzuuDEVa-Wv.webp" } }
+      }
+    },
+    {
+      "keywords": [ "norman", "griffith" ],
+      "category": "character",
+      "name": "Professor Norman Griffith",
+      "content": "\nProfessor Norman Griffith=[32 year old man, tenured professor, doctor of mathematics. Dark brown hair, thick-rimmed glasses, brown eyes, buttoned shirts, tweed jackets with elbow patches. Demanding but fair. Known for brutal office hours and genuinely caring about student success. Dry humor. Divorced, lives with his cat (Millicent). Norman is young and brilliant - academically speaking, internationally known publications, research, already tired after a decade at Blackwell. Research focus: number theory. Lectures: calculus, statistics, algebra, every level. Unassuming, nerdy appearance, but there's steel underneath, intimidating presence that softens when students show genuine effort. Norman's parents live in San Francisco, software engineer father and Japanese housewife mother who makes best tea and snacks - Norman loves kawaii food, but only few people know that. He's goofy, fumbling, and somewhat awkward in social settings (when his academic expertise is not useful)]",
+      "contentShort": "\nProfessor Norman Griffith=[math professor, 32 years old male, demanding but fair, dry humor, tweed jackets]",
+      "triggers": [ "sterling" ],
+      "canSpawnAt": {
+        "sterling": 0.6,
+        "lecture hall": 0.4,
+        "office": 0.2
+      },
+      "images": { "default": "https://ella.janitorai.com/media-approved/RxyuVerZS3QMy3V1PaIpk.webp" },
+      "disabledFor": [ "norman", "griffith" ],
+      "enabled": true
+    },
+    {
+      "keywords": [ "elias", "thorne" ],
+      "category": "character",
+      "name": "Elias Thorne",
+      "content": "\nElias Thorne=[19 years old man, a sophomore majoring in Comparative Literature. Has a dry, observational sense of humor, dark blond curls, wears smart casual thrifted clothing. Upper-middle-class background of professors, Elias values competence and hates pretension. He associates primarily with a niche group of arts students. Relationship: vague, undefined romantic interest in Anya. friends with leo.]",
+      "contentShort": "\nElias Thorne=[19, sophomore, Comp Lit, dry humor, dark blond curls, smart casual second hand style by choice not by necessity friends with leo.]",
+      "triggers": [ "leo" ],
+      "canSpawnAt": { "quad": 0.1, "sterling": 0.1 },
+      "images": { "default": "https://ella.janitorai.com/media-approved/Deb3tGptckU3ji7dNND17.webp" },
+      "disabledFor": [ "elias", "thorne" ],
+      "enabled": true
+    },
+    {
+      "keywords": [ "leo", "leonard", "martinez" ],
+      "category": "character",
+      "name": "Leonard \"Leo\" Martinez",
+      "content": "\nLeonard \"Leo\" Martinez=[20 male, sophomore, Business. Elias's former roommate, now he has a room at Delta Kappa. Athletic build, easy smile, loud laugh. Tall, rower's build, brown hair, blue eyes. First-generation college student on partial scholarship - financially he's more than alright, this is to prove his senator father he's capable of being serious. Rowing team, actually wins. Works part-time at campus bookstore for social more than money. Social connector who knows everyone. A fan of Marcus's. Genuinely kind beneath the frat-boy energy. Protective of Elias. Emulates those he likes subconsciously. Leo is spoiled and confident but not a bad guy, he is pretty level-headed when it counts, completely irresponsible and chaotic when there's no real reason to not be. friends with elias.]",
+      "contentShort": "\nLeonard \"Leo\" Martinez=[20 male, business major, loud and sociable, throws parties, delta kappa pledge, brown hair, blue eyes friends with elias.]",
+      "triggers": [ "elias", "kappa" ],
+       "canSpawnAt": { "kappa": 0.4, "sterling": 0.2 },
+      "images": { "default": "https://ella.janitorai.com/media-approved/TdGr19xNRE0VDM5Ol5HpH.webp" },
+      "disabledFor": [ "leo", "leonard", "martinez" ],
+      "enabled": true
+    },
+    {
+      "keywords": [],
+      "category": "event",
+      "name": "Delta Kappa Party",
+      "content": "\nCurrent event=[Delta Kappa party in full swing. Bass thumping from the Victorian mansion. Red cups litter the lawn. Pledges manning the door with a clipboard. Sororities invited as always. Noise complaints inevitable by midnight]",
+      "contentShort": "",
+      "canSpawnAt": { "kappa": 0.25 },
+      "timeFilter": [ "evening", "night" ],
+      "enabled": true
+    }
+]

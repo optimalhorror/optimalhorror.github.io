@@ -176,10 +176,21 @@ export function PropertyPanel({ selected, elements, onUpdate, onDelete, onAddSub
   // Node selected
   const { type } = selected;
 
+  // For sublocations, find the parent location name
+  const parentLocation = type === 'sublocation'
+    ? elements.find(el => el.data.id === selected.parent)?.data
+    : null;
+
   return (
     <div className="property-panel">
       <h3>Node Properties</h3>
       <span className={`node-type-badge ${type}`}>{type}</span>
+
+      {type === 'sublocation' && parentLocation && (
+        <div className="edge-info">
+          <div>{formData.name || selected.name} is found in {parentLocation.name}</div>
+        </div>
+      )}
 
       <div className="form-group">
         <label>Name</label>

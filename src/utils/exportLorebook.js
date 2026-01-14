@@ -1,12 +1,19 @@
 // Convert Cytoscape elements to lorebook.json format
 
 // Only return images object if it has non-empty URLs
+// Supports both single strings and arrays of URLs
 function cleanImages(images) {
   if (!images) return {};
   const cleaned = {};
-  for (const [key, url] of Object.entries(images)) {
-    if (url && typeof url === 'string' && url.trim()) {
-      cleaned[key] = url.trim();
+  for (const [key, value] of Object.entries(images)) {
+    if (Array.isArray(value)) {
+      const cleanedUrls = value.filter(url => typeof url === 'string' && url.trim()).map(url => url.trim());
+      if (cleanedUrls.length > 0) {
+        cleaned[key] = cleanedUrls;
+      }
+    } else if (value && typeof value === 'string' && value.trim()) {
+      // Single string - wrap in array for consistency
+      cleaned[key] = [value.trim()];
     }
   }
   return cleaned;

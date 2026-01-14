@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-export function Toolbar({ onAddNode, onImport, onExport, onClear }) {
+export function Toolbar({ onAddNode, onImport, onExport, onClear, onLoadExample }) {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -23,6 +23,7 @@ export function Toolbar({ onAddNode, onImport, onExport, onClear }) {
 
       <div className="toolbar-group">
         <button onClick={() => fileInputRef.current?.click()}>Import</button>
+        <button onClick={onLoadExample} className="secondary">Load Example</button>
         <button onClick={onExport} className="primary">Export</button>
       </div>
 

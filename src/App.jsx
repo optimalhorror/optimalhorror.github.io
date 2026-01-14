@@ -48,6 +48,17 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  const handleLoadExample = async () => {
+    try {
+      const response = await fetch('/example-lorebook.json');
+      const json = await response.json();
+      const elements = importLorebook(json);
+      graph.loadElements(elements);
+    } catch (err) {
+      alert('Failed to load example: ' + err.message);
+    }
+  };
+
   return (
     <div className="app">
       <div className="tabs">
@@ -76,6 +87,7 @@ function App() {
             onImport={handleImport}
             onExport={handleExport}
             onClear={graph.clearGraph}
+            onLoadExample={handleLoadExample}
           />
           <div className="main-content">
             <GraphCanvas
