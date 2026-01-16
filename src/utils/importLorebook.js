@@ -87,6 +87,8 @@ export function importLorebook(json) {
   });
 
   // Second pass: create character and event nodes, and their spawn edges
+  const characterMap = {}; // keyword -> { id, name }
+
   entries.forEach((entry, index) => {
     if (entry.category === 'character') {
       const id = `char_${++nodeCounter}`;
@@ -103,8 +105,18 @@ export function importLorebook(json) {
           images: entry.images || {},
           disabledFor: entry.disabledFor || [],
           filters: entry.filters || {},
+          // Store knows temporarily for edge creation
+          _importedKnows: entry.knows || {},
         },
         position: pos,
+      });
+
+      // Map keywords to this character's ID
+      const keywords = Array.isArray(entry.keywords) ? entry.keywords : [];
+      keywords.forEach(kw => {
+        if (typeof kw === 'string') {
+          characterMap[kw.toLowerCase()] = { id, name: entry.name };
+        }
       });
 
       // Create spawn edges from canSpawnAt
@@ -256,6 +268,53 @@ export function importLorebook(json) {
       });
       // Clean up temporary field
       delete el.data._importedTriggers;
+    }
+  });
+
+  // Fourth pass: create "knows" edges from character relationships
+  // knows edges are undirected, so we only create one edge per pair
+  elements.forEach(el => {
+    if (el.data.type === 'character' && el.data._importedKnows) {
+      Object.entries(el.data._importedKnows).forEach(([targetKeyword, knowsData]) => {
+        const targetInfo = characterMap[targetKeyword.toLowerCase()];
+        if (targetInfo && targetInfo.id !== el.data.id) {
+          // Check if this edge already exists in EITHER direction (knows edges are undirected)
+          const exists = elements.some(e =>
+            e.data.edgeType === 'knows' && (
+              (e.data.source === el.data.id && e.data.target === targetInfo.id) ||
+              (e.data.source === targetInfo.id && e.data.target === el.data.id)
+            )
+          );
+
+          if (!exists) {
+            // This character is the source, so their thoughts go in sourceThinks
+            // We'll need to find the reverse relationship for targetThinks
+            const targetEl = elements.find(e => e.data.id === targetInfo.id);
+            const reverseKnows = targetEl?.data._importedKnows?.[el.data.keywords?.[0]?.toLowerCase()];
+
+            elements.push({
+              data: {
+                id: `edge_${++nodeCounter}`,
+                source: el.data.id,
+                target: targetInfo.id,
+                edgeType: 'knows',
+                relationship: knowsData.relationship || '',
+                sourceThinks: knowsData.thoughts || '',
+                targetThinks: reverseKnows?.thoughts || '',
+              },
+            });
+          }
+        }
+      });
+      // Clean up temporary field
+      delete el.data._importedKnows;
+    }
+  });
+
+  // Clean up any remaining _importedKnows fields (for characters without relationships)
+  elements.forEach(el => {
+    if (el.data._importedKnows) {
+      delete el.data._importedKnows;
     }
   });
 

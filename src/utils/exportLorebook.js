@@ -82,8 +82,9 @@ export function exportLorebook(elements) {
   });
 
   // Collect "knows" edge data for characters
+  // Store as structured data: { charId: { triggers: [], knows: { otherKeyword: { relationship, thoughts } } } }
   const knowsEdges = edges.filter(e => e.data.edgeType === 'knows');
-  const characterRelationships = {}; // charId -> { triggers: [], contentAppend: '', contentShortAppend: '' }
+  const characterRelationships = {};
 
   knowsEdges.forEach(edge => {
     const sourceId = edge.data.source;
@@ -96,40 +97,31 @@ export function exportLorebook(elements) {
 
     // Initialize if not exists
     if (!characterRelationships[sourceId]) {
-      characterRelationships[sourceId] = { triggers: [], contentAppend: '', contentShortAppend: '' };
+      characterRelationships[sourceId] = { triggers: [], knows: {} };
     }
     if (!characterRelationships[targetId]) {
-      characterRelationships[targetId] = { triggers: [], contentAppend: '', contentShortAppend: '' };
+      characterRelationships[targetId] = { triggers: [], knows: {} };
     }
 
     // Add triggers (each triggers the other via first keyword)
-    if (targetNode?.keywords?.[0]) {
-      characterRelationships[sourceId].triggers.push(targetNode.keywords[0]);
-    }
-    if (sourceNode?.keywords?.[0]) {
-      characterRelationships[targetId].triggers.push(sourceNode.keywords[0]);
-    }
+    const sourceKeyword = sourceNode?.keywords?.[0];
+    const targetKeyword = targetNode?.keywords?.[0];
 
-    // Build relationship text for both characters
-    if (relationship && targetNode?.keywords?.[0]) {
-      const relText = ` ${relationship} with ${targetNode.keywords[0]}.`;
-      characterRelationships[sourceId].contentAppend += relText;
-      characterRelationships[sourceId].contentShortAppend += relText;
+    if (targetKeyword) {
+      characterRelationships[sourceId].triggers.push(targetKeyword);
+      // Source knows about target
+      characterRelationships[sourceId].knows[targetKeyword] = {
+        relationship: relationship || '',
+        thoughts: sourceThinks || '',
+      };
     }
-    if (relationship && sourceNode?.keywords?.[0]) {
-      const relText = ` ${relationship} with ${sourceNode.keywords[0]}.`;
-      characterRelationships[targetId].contentAppend += relText;
-      characterRelationships[targetId].contentShortAppend += relText;
-    }
-
-    // Add sourceThinks to source's content only
-    if (sourceThinks) {
-      characterRelationships[sourceId].contentAppend += ` ${sourceThinks}`;
-    }
-
-    // Add targetThinks to target's content only
-    if (targetThinks) {
-      characterRelationships[targetId].contentAppend += ` ${targetThinks}`;
+    if (sourceKeyword) {
+      characterRelationships[targetId].triggers.push(sourceKeyword);
+      // Target knows about source
+      characterRelationships[targetId].knows[sourceKeyword] = {
+        relationship: relationship || '',
+        thoughts: targetThinks || '',
+      };
     }
   });
 
@@ -160,36 +152,32 @@ export function exportLorebook(elements) {
     });
 
     // Get relationship data for this character
-    const relData = characterRelationships[data.id] || { triggers: [], contentAppend: '', contentShortAppend: '' };
+    const relData = characterRelationships[data.id] || { triggers: [], knows: {} };
 
     // Triggers are auto-generated from knows edges only
-    // (spawn locations don't trigger - spawning somewhere doesn't mean you bring that location's description)
     const allTriggers = [...new Set(relData.triggers)];
 
-    // Append relationship content if any
-    let content = data.content || '';
-    let contentShort = data.contentShort || '';
-    if (relData.contentAppend && content) {
-      // Insert before the closing bracket
-      content = content.replace(/\]$/, relData.contentAppend + ']');
-    }
-    if (relData.contentShortAppend && contentShort) {
-      contentShort = contentShort.replace(/\]$/, relData.contentShortAppend + ']');
-    }
-
-    entries.push({
+    // Content stays clean - relationships are stored in knows field
+    const entry = {
       keywords: data.keywords || [],
       category: 'character',
       name: data.name,
-      content,
-      contentShort,
+      content: data.content || '',
+      contentShort: data.contentShort || '',
       triggers: allTriggers,
       canSpawnAt: Object.keys(canSpawnAt).length > 0 ? canSpawnAt : {},
       images: cleanImages(data.images),
       filters: data.filters || {},
       disabledFor: data.disabledFor || [],
       enabled: true,
-    });
+    };
+
+    // Add knows field if there are any relationships
+    if (Object.keys(relData.knows).length > 0) {
+      entry.knows = relData.knows;
+    }
+
+    entries.push(entry);
   });
 
   // Process events
