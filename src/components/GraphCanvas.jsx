@@ -22,6 +22,7 @@ function getStylesheet(isDark) {
         'height': 50,
         'border-width': 2,
         'border-color': '#1e40af',
+        'z-index': 10,
       }
     },
     // Character nodes
@@ -38,6 +39,7 @@ function getStylesheet(isDark) {
         'height': 50,
         'border-width': 2,
         'border-color': '#166534',
+        'z-index': 10,
       }
     },
     // Event nodes
@@ -54,6 +56,7 @@ function getStylesheet(isDark) {
         'height': 50,
         'border-width': 2,
         'border-color': '#c2410c',
+        'z-index': 10,
       }
     },
     // Sublocation nodes
@@ -70,6 +73,7 @@ function getStylesheet(isDark) {
         'height': 30,
         'border-width': 2,
         'border-color': '#3730a3',
+        'z-index': 10,
       }
     },
     // Parent nodes (compound)
@@ -107,6 +111,7 @@ function getStylesheet(isDark) {
         'text-background-color': textBg,
         'text-background-opacity': 0.8,
         'text-background-padding': 2,
+        'z-index': 1,
       }
     },
     // Adjacent edges (location -- location, undirected)
@@ -116,6 +121,7 @@ function getStylesheet(isDark) {
         'width': 2,
         'line-color': '#60a5fa',
         'curve-style': 'bezier',
+        'z-index': 1,
       }
     },
     // Knows edges (character -- character, undirected)
@@ -131,6 +137,7 @@ function getStylesheet(isDark) {
         'text-background-color': textBg,
         'text-background-opacity': 1,
         'text-background-padding': 2,
+        'z-index': 1,
       }
     },
     // Selected edges
@@ -328,6 +335,25 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
     }
   };
 
+  const handleAutoLayout = () => {
+    if (cyRef.current) {
+      cyRef.current.layout({
+        name: 'cose',
+        animate: true,
+        animationDuration: 500,
+        nodeDimensionsIncludeLabels: true,
+        nodeRepulsion: 8000,
+        idealEdgeLength: 100,
+        edgeElasticity: 100,
+        gravity: 0.25,
+        numIter: 1000,
+        initialTemp: 200,
+        coolingFactor: 0.95,
+        minTemp: 1.0,
+      }).run();
+    }
+  };
+
   return (
     <div className="graph-container" ref={containerRef}>
       <CytoscapeComponent
@@ -344,6 +370,7 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
         <button onClick={handleZoomIn} title="Zoom in">+</button>
         <button onClick={handleZoomOut} title="Zoom out">−</button>
         <button onClick={handleFit} title="Fit to screen">⊡</button>
+        <button onClick={handleAutoLayout} title="Auto-arrange (minimize crossings)">⟳</button>
       </div>
 
       {edgeSource && (
