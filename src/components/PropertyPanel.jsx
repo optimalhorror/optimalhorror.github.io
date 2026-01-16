@@ -483,6 +483,21 @@ function SublocationsDisplay({ parentId, elements, onAddSubLocation, onDelete })
   );
 }
 
+// Small clickable image preview
+function ImagePreview({ url }) {
+  if (!url || !url.trim()) return null;
+
+  const handleClick = () => {
+    window.open(url, '_blank');
+  };
+
+  return (
+    <div className="image-preview" onClick={handleClick} title="Click to open in new tab">
+      <img src={url} alt="preview" onError={(e) => e.target.style.display = 'none'} />
+    </div>
+  );
+}
+
 // Simplified image editor for events - only default images (array for random pick)
 function EventImagesEditor({ value = {}, onChange }) {
   // Normalize to array
@@ -512,14 +527,17 @@ function EventImagesEditor({ value = {}, onChange }) {
   return (
     <div className="event-images">
       {urls.map((url, index) => (
-        <div key={index} className="image-entry">
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => handleUpdate(index, e.target.value)}
-            placeholder="Image URL..."
-          />
-          <button type="button" onClick={() => handleRemove(index)}>×</button>
+        <div key={index} className="image-entry-with-preview">
+          <div className="image-entry">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => handleUpdate(index, e.target.value)}
+              placeholder="Image URL..."
+            />
+            <button type="button" onClick={() => handleRemove(index)}>×</button>
+          </div>
+          <ImagePreview url={url} />
         </div>
       ))}
       <div className="image-entry add-url-row">

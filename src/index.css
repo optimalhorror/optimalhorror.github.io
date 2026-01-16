@@ -425,6 +425,31 @@ button.secondary:hover {
   opacity: 1;
 }
 
+.image-entry-with-preview {
+  margin-bottom: 8px;
+}
+
+.image-preview {
+  margin-top: 4px;
+  width: 60px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.image-preview:hover {
+  border-color: var(--accent);
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .time-image-add {
   margin-top: 12px;
   padding-top: 12px;

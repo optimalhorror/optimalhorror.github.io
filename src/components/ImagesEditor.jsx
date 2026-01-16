@@ -18,6 +18,21 @@ function toArray(val) {
   return [];
 }
 
+// Small clickable image preview
+function ImagePreview({ url }) {
+  if (!url || !url.trim()) return null;
+
+  const handleClick = () => {
+    window.open(url, '_blank');
+  };
+
+  return (
+    <div className="image-preview" onClick={handleClick} title="Click to open in new tab">
+      <img src={url} alt="preview" onError={(e) => e.target.style.display = 'none'} />
+    </div>
+  );
+}
+
 export function ImagesEditor({ value = {}, onChange }) {
   const [selectedTimes, setSelectedTimes] = useState([]);
   const [newUrl, setNewUrl] = useState('');
@@ -115,14 +130,17 @@ export function ImagesEditor({ value = {}, onChange }) {
       <div className="image-group">
         <span className="image-key">default</span>
         {defaultUrls.map((url, index) => (
-          <div key={index} className="image-entry">
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => handleUpdateDefaultUrl(index, e.target.value)}
-              placeholder="Image URL..."
-            />
-            <button type="button" onClick={() => handleRemoveDefaultUrl(index)}>×</button>
+          <div key={index} className="image-entry-with-preview">
+            <div className="image-entry">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => handleUpdateDefaultUrl(index, e.target.value)}
+                placeholder="Image URL..."
+              />
+              <button type="button" onClick={() => handleRemoveDefaultUrl(index)}>×</button>
+            </div>
+            <ImagePreview url={url} />
           </div>
         ))}
         <div className="image-entry add-url-row">
@@ -157,14 +175,17 @@ export function ImagesEditor({ value = {}, onChange }) {
               <button type="button" className="remove-group-btn" onClick={() => handleRemove(key)}>Remove all</button>
             </div>
             {urlArray.map((url, index) => (
-              <div key={index} className="image-entry">
-                <input
-                  type="text"
-                  value={url}
-                  onChange={(e) => handleUpdateTimeUrl(key, index, e.target.value)}
-                  placeholder="URL..."
-                />
-                <button type="button" onClick={() => handleRemoveTimeUrl(key, index)}>×</button>
+              <div key={index} className="image-entry-with-preview">
+                <div className="image-entry">
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => handleUpdateTimeUrl(key, index, e.target.value)}
+                    placeholder="URL..."
+                  />
+                  <button type="button" onClick={() => handleRemoveTimeUrl(key, index)}>×</button>
+                </div>
+                <ImagePreview url={url} />
               </div>
             ))}
             <div className="image-entry add-url-row">

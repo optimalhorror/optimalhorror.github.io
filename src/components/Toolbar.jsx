@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-export function Toolbar({ onAddNode, onImport, onExport, onClear, onLoadExample }) {
+export function Toolbar({ onAddNode, onImport, onExport, onClear, onRemoveAllEdges, onLoadExample }) {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -30,10 +30,16 @@ export function Toolbar({ onAddNode, onImport, onExport, onClear, onLoadExample 
       <div className="toolbar-separator" />
 
       <button onClick={() => {
+        if (confirm('Remove all edges?')) {
+          onRemoveAllEdges();
+        }
+      }}>Remove Edges</button>
+
+      <button onClick={() => {
         if (confirm('Clear all nodes and edges?')) {
           onClear();
         }
-      }}>Clear</button>
+      }}>Clear All</button>
 
       <input
         type="file"

@@ -144,6 +144,13 @@ export function useGraph() {
     edgeIdCounter = 1;
   }, []);
 
+  const removeAllEdges = useCallback(() => {
+    setElements(prev => prev.filter(el => !el.data.source));
+    if (selectedElement?.source) {
+      setSelectedElement(null);
+    }
+  }, [selectedElement]);
+
   const loadElements = useCallback((newElements) => {
     // Find max IDs to continue counting
     let maxNodeId = 0;
@@ -182,6 +189,7 @@ export function useGraph() {
     updateElement,
     deleteElement,
     clearGraph,
+    removeAllEdges,
     loadElements,
     selectElement,
   };

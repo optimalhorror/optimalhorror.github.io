@@ -82,6 +82,7 @@ function App() {
             onImport={handleImport}
             onExport={handleExport}
             onClear={graph.clearGraph}
+            onRemoveAllEdges={graph.removeAllEdges}
             onLoadExample={handleLoadExample}
           />
           <div className="main-content">

@@ -90,21 +90,22 @@ function getStylesheet(isDark) {
         'border-color': selectedBorder,
       }
     },
-    // Spawn edges (character/event -> location)
+    // Spawn edges (character/event -> location) - more subtle/transparent
     {
       selector: 'edge[edgeType="spawn"]',
       style: {
         'width': 2,
-        'line-color': '#9ca3af',
-        'target-arrow-color': '#9ca3af',
+        'line-color': isDark ? '#6b7280' : '#d1d5db',
+        'target-arrow-color': isDark ? '#6b7280' : '#d1d5db',
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'line-style': 'dashed',
+        'opacity': 0.5,
         'label': 'data(probability)',
         'font-size': 10,
-        'color': isDark ? '#e0e0e0' : '#333',
+        'color': isDark ? '#9ca3af' : '#6b7280',
         'text-background-color': textBg,
-        'text-background-opacity': 1,
+        'text-background-opacity': 0.8,
         'text-background-padding': 2,
       }
     },
