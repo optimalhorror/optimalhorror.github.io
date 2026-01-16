@@ -1,5 +1,10 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import CytoscapeComponent from 'react-cytoscapejs';
+import cytoscape from 'cytoscape';
+import fcose from 'cytoscape-fcose';
+
+// Register fcose layout extension
+cytoscape.use(fcose);
 
 function getStylesheet(isDark) {
   const labelColor = isDark ? '#e0e0e0' : undefined; // undefined uses node-specific colors in light mode
@@ -338,18 +343,22 @@ export function GraphCanvas({ elements, cyRef, onSelect, onAddEdge }) {
   const handleAutoLayout = () => {
     if (cyRef.current) {
       cyRef.current.layout({
-        name: 'cose',
+        name: 'fcose',
         animate: true,
         animationDuration: 500,
+        quality: 'proof',
         nodeDimensionsIncludeLabels: true,
-        nodeRepulsion: 8000,
-        idealEdgeLength: 100,
-        edgeElasticity: 100,
-        gravity: 0.25,
-        numIter: 1000,
-        initialTemp: 200,
-        coolingFactor: 0.95,
-        minTemp: 1.0,
+        nodeRepulsion: 6000,
+        idealEdgeLength: 80,
+        edgeElasticity: 0.45,
+        gravity: 0.3,
+        gravityRange: 3.8,
+        // Compound node specific settings
+        nestingFactor: 0.1,
+        tile: true,
+        tilingPaddingVertical: 10,
+        tilingPaddingHorizontal: 10,
+        packComponents: true,
       }).run();
     }
   };

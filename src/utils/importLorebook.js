@@ -60,15 +60,18 @@ export function importLorebook(json) {
         }
       });
 
-      // Handle sublocations - position them relative to parent
+      // Handle sublocations - position them in a grid to keep compound node square
       if (entry.subLocations) {
         const subEntries = Object.entries(entry.subLocations);
         const firstKeyword = keywords[0];
+        const cols = Math.ceil(Math.sqrt(subEntries.length));
         subEntries.forEach(([subName, subData], subIndex) => {
           const subId = `subloc_${++nodeCounter}`;
-          // Position sublocations in a row below the parent center
-          const subX = pos.x + (subIndex - (subEntries.length - 1) / 2) * 50;
-          const subY = pos.y + 20;
+          // Position sublocations in a grid pattern
+          const col = subIndex % cols;
+          const row = Math.floor(subIndex / cols);
+          const subX = pos.x + (col - (cols - 1) / 2) * 45;
+          const subY = pos.y + row * 45;
           elements.push({
             data: {
               id: subId,

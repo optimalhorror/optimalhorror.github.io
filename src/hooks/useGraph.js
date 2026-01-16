@@ -60,13 +60,17 @@ export function useGraph() {
       }
     }
 
-    // Count existing sublocations to offset position
+    // Count existing sublocations and position new one in a grid
     const existingSubs = elements.filter(el => el.data.parent === parentId);
-    const offset = existingSubs.length * 50;
+    const subIndex = existingSubs.length;
+    const totalSubs = subIndex + 1;
+    const cols = Math.ceil(Math.sqrt(totalSubs));
+    const col = subIndex % cols;
+    const row = Math.floor(subIndex / cols);
 
     const newNode = {
       data,
-      position: { x: parentPos.x + offset, y: parentPos.y + 20 },
+      position: { x: parentPos.x + (col - (cols - 1) / 2) * 45, y: parentPos.y + row * 45 },
     };
     setElements(prev => [...prev, newNode]);
     return data.id;
